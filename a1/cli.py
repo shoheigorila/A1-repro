@@ -201,6 +201,100 @@ def list_targets(
 
 
 @app.command()
+def resolve_proxy(
+    address: str = typer.Argument(..., help="Contract address"),
+    chain_id: int = typer.Option(1, "--chain", "-c", help="Chain ID"),
+    no_nested: bool = typer.Option(False, "--no-nested", help="Don't resolve nested proxies"),
+):
+    """Resolve a proxy contract to its implementation."""
+    async def _resolve():
+        from a1.tools.proxy_resolver import ProxyResolver
+
+        resolver = ProxyResolver(chain_id)
+        result = await resolver.execute(
+            address=address,
+            resolve_nested=not no_nested,
+        )
+        await resolver.close()
+        return result
+
+    result = asyncio.run(_resolve())
+
+    if not result.success:
+        console.print(f"[red]Error: {result.error}[/red]")
+        raise typer.Exit(1)
+
+    console.print(result.summary)
+
+
+@app.command()
+def extract_constructor(
+    address: str = typer.Argument(..., help="Contract address"),
+    chain_id: int = typer.Option(1, "--chain", "-c", help="Chain ID"),
+):
+    """Extract constructor parameters from a contract."""
+    async def _extract():
+        from a1.tools.constructor_extractor import ConstructorExtractor
+
+        extractor = ConstructorExtractor(chain_id)
+        result = await extractor.execute(address=address)
+        await extractor.close()
+        return result
+
+    result = asyncio.run(_extract())
+
+    if not result.success:
+        console.print(f"[red]Error: {result.error}[/red]")
+        raise typer.Exit(1)
+
+    console.print(result.summary)
+
+
+@app.command()
+def analyze_code(
+    source_file: Path = typer.Argument(..., help="Solidity source file"),
+    target: Optional[str] = typer.Option(None, "--target", "-t", help="Target contract name"),
+    minimal: bool = typer.Option(False, "--minimal", "-m", help="Extract minimal source"),
+):
+    """Analyze Solidity code structure and dependencies."""
+    from a1.tools.code_sanitizer import CodeSanitizer, ASTAnalyzer
+
+    if not source_file.exists():
+        console.print(f"[red]File not found: {source_file}[/red]")
+        raise typer.Exit(1)
+
+    code = source_file.read_text()
+    sanitizer = CodeSanitizer()
+
+    if minimal and target:
+        # Extract minimal source
+        minimal_code = sanitizer.extract_minimal(code, target)
+        console.print(minimal_code)
+    else:
+        # Analyze structure
+        info = sanitizer.get_contract_info(code)
+
+        console.print(f"[bold]Pragma:[/bold] {info.get('pragma', 'N/A')}")
+        console.print(f"[bold]Imports:[/bold] {len(info.get('imports', []))}")
+        console.print()
+
+        for name, contract in info.get("contracts", {}).items():
+            console.print(f"[bold cyan]{contract['type']} {name}[/bold cyan]")
+            if contract.get("inherits"):
+                console.print(f"  Inherits: {', '.join(contract['inherits'])}")
+            console.print(f"  Functions: {len(contract.get('functions', []))}")
+            console.print(f"  Events: {len(contract.get('events', []))}")
+            console.print(f"  State Vars: {len(contract.get('state_variables', []))}")
+            console.print(f"  Lines: {contract.get('lines', (0, 0))[0]}-{contract.get('lines', (0, 0))[1]}")
+            console.print()
+
+        if target:
+            unused = sanitizer.find_unused_contracts(code, [target])
+            if unused:
+                console.print(f"[yellow]Unused contracts (from {target}): {', '.join(unused)}[/yellow]")
+
+
+@app.command()
 def version():
     """Show version information."""
     from a1 import __version__

@@ -69,9 +69,47 @@ class RPCClient:
         slot: int,
         block: BlockIdentifier = "latest",
     ) -> str:
-        """Read storage slot."""
+        """Read storage slot (int slot)."""
         result = await self.w3.eth.get_storage_at(address, slot, block)
         return result.hex()
+
+    async def eth_get_storage_at(
+        self,
+        address: str,
+        slot: str,
+        block: BlockIdentifier = "latest",
+    ) -> str:
+        """Read storage slot (hex string slot, for EIP-1967 etc)."""
+        # Convert hex string to int for web3
+        slot_int = int(slot, 16) if slot.startswith("0x") else int(slot)
+        result = await self.w3.eth.get_storage_at(
+            self.w3.to_checksum_address(address),
+            slot_int,
+            block,
+        )
+        return "0x" + result.hex()
+
+    async def eth_get_code(
+        self,
+        address: str,
+        block: BlockIdentifier = "latest",
+    ) -> str:
+        """Get contract bytecode."""
+        code = await self.w3.eth.get_code(
+            self.w3.to_checksum_address(address),
+            block,
+        )
+        return "0x" + code.hex()
+
+    async def eth_get_transaction_by_hash(self, tx_hash: str) -> dict[str, Any] | None:
+        """Get transaction by hash."""
+        try:
+            tx = await self.w3.eth.get_transaction(tx_hash)
+            if tx:
+                return dict(tx)
+        except Exception:
+            pass
+        return None
 
     async def get_block_number(self) -> int:
         """Get latest block number."""

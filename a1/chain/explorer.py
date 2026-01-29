@@ -40,8 +40,27 @@ class ExplorerClient:
             await self._client.aclose()
             self._client = None
 
-    async def _request(self, params: dict[str, Any]) -> dict[str, Any]:
-        """Make API request."""
+    async def _request(
+        self,
+        module_or_params: str | dict[str, Any],
+        action: str | None = None,
+        extra_params: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Make API request.
+
+        Can be called as:
+        - _request({"module": "...", "action": "...", ...})  # dict params
+        - _request("module", "action", {"key": "value"})     # separate params
+        """
+        if isinstance(module_or_params, dict):
+            params = module_or_params
+        else:
+            params = {
+                "module": module_or_params,
+                "action": action,
+                **(extra_params or {}),
+            }
+
         if self.api_key:
             params["apikey"] = self.api_key
 
@@ -53,7 +72,7 @@ class ExplorerClient:
         if data.get("status") == "0" and data.get("message") != "No transactions found":
             raise Exception(f"Explorer API error: {data.get('result', 'Unknown error')}")
 
-        return data
+        return data.get("result", data)
 
     async def get_contract_source(self, address: str) -> dict[str, Any]:
         """Get verified contract source code."""
