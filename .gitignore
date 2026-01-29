@@ -1,0 +1,35 @@
+# Foundry
+harness/out/
+harness/cache/
+harness/broadcast/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+
+# Logs
+*.log
+outputs/
+
+# Dependencies
+node_modules/
