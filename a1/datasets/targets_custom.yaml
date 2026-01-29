@@ -1,0 +1,19 @@
+# Custom targets for testing
+# Each target defines a contract to analyze
+
+- name: "dummy_test"
+  chain_id: 1
+  block_number: 18000000
+  addresses:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"  # WETH (for testing)
+  tags: ["test"]
+  description: "Dummy target for testing the framework"
+
+# Add more targets here following the same format:
+# - name: "target_name"
+#   chain_id: 1  # 1 for Ethereum, 56 for BSC
+#   block_number: 12345678  # Block to fork from
+#   addresses:
+#     - "0x..."  # Target contract addresses
+#   tags: ["tag1", "tag2"]
+#   description: "Description of the target"

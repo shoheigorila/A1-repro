@@ -1,0 +1,51 @@
+# LLM model configurations
+
+- name: "gpt-4-turbo"
+  provider: "openai"
+  model: "gpt-4-turbo-preview"
+  max_turns: 5
+  max_tool_calls: 5
+  temperature: 0.7
+
+- name: "gpt-4o"
+  provider: "openai"
+  model: "gpt-4o"
+  max_turns: 5
+  max_tool_calls: 5
+  temperature: 0.7
+
+- name: "claude-3-opus"
+  provider: "anthropic"
+  model: "claude-3-opus-20240229"
+  max_turns: 5
+  max_tool_calls: 5
+  temperature: 0.7
+
+- name: "claude-3-sonnet"
+  provider: "anthropic"
+  model: "claude-3-sonnet-20240229"
+  max_turns: 5
+  max_tool_calls: 5
+  temperature: 0.7
+
+- name: "claude-3.5-sonnet"
+  provider: "anthropic"
+  model: "claude-3-5-sonnet-20241022"
+  max_turns: 5
+  max_tool_calls: 5
+  temperature: 0.7
+
+# OpenRouter models (access to multiple providers)
+- name: "openrouter-gpt4"
+  provider: "openrouter"
+  model: "openai/gpt-4-turbo"
+  max_turns: 5
+  max_tool_calls: 5
+  temperature: 0.7
+
+- name: "openrouter-claude"
+  provider: "openrouter"
+  model: "anthropic/claude-3-opus"
+  max_turns: 5
+  max_tool_calls: 5
+  temperature: 0.7
