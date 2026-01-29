@@ -71,6 +71,11 @@ class ConcreteExecution(Tool):
                     "description": "Initial ETH balance for the harness (in wei)",
                     "default": "100000000000000000000",  # 100 ETH
                 },
+                "normalize_profit": {
+                    "type": "boolean",
+                    "description": "Use profit oracle to normalize multi-token profits",
+                    "default": True,
+                },
             },
             "required": ["strategy_code"],
         }
@@ -81,6 +86,7 @@ class ConcreteExecution(Tool):
         block_number: int | None = None,
         tracked_tokens: list[str] | None = None,
         initial_balance: str = "100000000000000000000",
+        normalize_profit: bool = True,
     ) -> ToolResult:
         """Execute strategy on forked blockchain."""
         try:
@@ -93,6 +99,11 @@ class ConcreteExecution(Tool):
                     tracked_tokens=tracked_tokens or [],
                     initial_balance=initial_balance,
                 )
+
+                # Apply profit normalization if requested and execution succeeded
+                if normalize_profit and result.success and result.details.get("balance_changes"):
+                    result = await self._normalize_profit(result, block_number)
+
                 return result
 
         except asyncio.TimeoutError:
@@ -416,3 +427,60 @@ contract ExecuteTest is Test {{
             success=execution_success,
             error=revert_reason if not execution_success else None,
         )
+
+    async def _normalize_profit(
+        self,
+        result: ToolResult,
+        block_number: int | None,
+    ) -> ToolResult:
+        """Normalize profit using profit oracle."""
+        try:
+            from a1.tools.profit_oracle import ProfitOracle
+
+            oracle = ProfitOracle(self.chain_id, self.rpc_url)
+            balance_changes = result.details.get("balance_changes", {})
+
+            if not balance_changes:
+                return result
+
+            report = await oracle.analyze(balance_changes, block_number)
+            await oracle.close()
+
+            # Update result with normalized profit
+            result.details["raw_profit"] = result.details.get("profit", 0)
+            result.details["normalized_profit"] = report.net_profit
+            result.details["surplus_value"] = report.surplus_value
+            result.details["deficit_cost"] = report.deficit_cost
+            result.details["is_profitable"] = report.is_profitable
+            result.details["all_balances_preserved"] = report.all_balances_preserved
+            result.details["profit_confidence"] = report.confidence
+            result.details["net_profit_formatted"] = report.net_profit_formatted
+
+            # Update the profit field to normalized value
+            result.details["profit"] = report.net_profit
+
+            # Update summary
+            profit_section = f"""
+
+## Normalized Profit Analysis
+Raw Profit (base only): {report.raw_profit:+,} wei
+Surplus Value: {report.surplus_value:+,} wei
+Deficit Cost: {report.deficit_cost:,} wei
+**Net Profit: {report.net_profit:+,} wei ({report.net_profit_formatted:+.6f} {report.base_symbol})**
+Profitable: {'✅ YES' if report.is_profitable else '❌ NO'}
+"""
+            if not report.all_balances_preserved:
+                profit_section += "⚠️ Warning: Some token balances decreased\n"
+
+            result = ToolResult(
+                summary=result.summary + profit_section,
+                details=result.details,
+                success=result.success,
+                error=result.error,
+            )
+
+        except Exception as e:
+            # If normalization fails, keep original result but add warning
+            result.details["normalization_error"] = str(e)
+
+        return result
