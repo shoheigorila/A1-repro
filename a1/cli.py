@@ -295,6 +295,163 @@ def analyze_code(
 
 
 @app.command()
+def experiment(
+    target: str = typer.Argument(..., help="Target name from dataset"),
+    model: str = typer.Option("gpt-4-turbo", "--model", "-m", help="Model name"),
+    dataset: str = typer.Option("targets_custom", "--dataset", "-d", help="Dataset file"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Output directory"),
+    rpc_url: Optional[str] = typer.Option(None, "--rpc", help="Custom RPC URL"),
+):
+    """Run a single experiment on a target."""
+    async def _run():
+        from a1.experiments.run_one import run_single_experiment
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+        ) as progress:
+            task = progress.add_task(f"Running {target} with {model}...", total=None)
+
+            result = await run_single_experiment(
+                target_name=target,
+                model_name=model,
+                targets_file=dataset,
+                output_dir=output,
+                rpc_url=rpc_url,
+            )
+
+            progress.remove_task(task)
+
+        return result
+
+    result = asyncio.run(_run())
+
+    if result.get("success"):
+        console.print(f"[bold green]SUCCESS[/bold green] - Profit: {result['final_profit']} wei")
+    else:
+        console.print(f"[bold red]FAILED[/bold red] - {result.get('error', 'Unknown error')}")
+
+    console.print(f"Turns: {result.get('turns', 0)} | Tokens: {result.get('total_tokens', 0)}")
+
+
+@app.command()
+def batch(
+    dataset: str = typer.Option("targets_custom", "--dataset", "-d", help="Dataset file"),
+    models: Optional[str] = typer.Option(None, "--models", "-m", help="Comma-separated model names"),
+    targets: Optional[str] = typer.Option(None, "--targets", "-t", help="Comma-separated target names"),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Output directory"),
+    parallel: int = typer.Option(1, "--parallel", "-p", help="Parallel experiments"),
+    rpc_url: Optional[str] = typer.Option(None, "--rpc", help="Custom RPC URL"),
+):
+    """Run batch experiments."""
+    async def _run():
+        from a1.experiments.run_batch import run_batch_experiments
+
+        target_list = targets.split(",") if targets else None
+        model_list = models.split(",") if models else None
+
+        results = await run_batch_experiments(
+            targets=target_list,
+            models=model_list,
+            targets_file=dataset,
+            output_dir=output,
+            rpc_url=rpc_url,
+            parallel=parallel,
+        )
+
+        return results
+
+    results = asyncio.run(_run())
+
+    # Summary
+    successful = sum(1 for r in results if r.get("success"))
+    console.print(f"\n[bold]Batch Complete:[/bold] {successful}/{len(results)} successful")
+
+
+@app.command()
+def metrics(
+    output_dir: Path = typer.Argument(..., help="Directory with experiment results"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+):
+    """Calculate and display experiment metrics."""
+    from a1.experiments.metrics import load_results_from_dir, calculate_metrics, format_metrics_report
+
+    results = load_results_from_dir(output_dir)
+
+    if not results:
+        console.print("[yellow]No results found in directory[/yellow]")
+        raise typer.Exit(1)
+
+    exp_metrics = calculate_metrics(results)
+
+    if json_output:
+        import dataclasses
+        console.print_json(data=dataclasses.asdict(exp_metrics))
+    else:
+        console.print(format_metrics_report(exp_metrics))
+
+
+@app.command()
+def results(
+    command: str = typer.Argument("list", help="Command: list, stats, export, import"),
+    path: Optional[Path] = typer.Option(None, "--path", "-p", help="File path for export/import"),
+    target: Optional[str] = typer.Option(None, "--target", "-t", help="Filter by target"),
+    model: Optional[str] = typer.Option(None, "--model", "-m", help="Filter by model"),
+    limit: int = typer.Option(20, "--limit", "-l", help="Max results for list"),
+):
+    """Manage stored experiment results."""
+    from a1.experiments.results_store import ResultsStore
+
+    store = ResultsStore()
+
+    if command == "list":
+        runs = store.list_runs(target=target, model=model, limit=limit)
+        table = Table(title="Experiment Results")
+        table.add_column("ID", style="dim")
+        table.add_column("Target", style="cyan")
+        table.add_column("Model", style="green")
+        table.add_column("Status")
+        table.add_column("Profit", justify="right")
+        table.add_column("Turns", justify="right")
+
+        for run in runs:
+            status = "[green]✓[/green]" if run.success else "[red]✗[/red]"
+            table.add_row(
+                run.run_id[:8],
+                run.target_name,
+                run.model_name,
+                status,
+                f"{run.final_profit:,}",
+                str(run.turns),
+            )
+
+        console.print(table)
+
+    elif command == "stats":
+        stats = store.get_stats()
+        console.print_json(data=stats)
+
+    elif command == "export":
+        if not path:
+            console.print("[red]--path required for export[/red]")
+            raise typer.Exit(1)
+        count = store.export_jsonl(path)
+        console.print(f"Exported {count} records to {path}")
+
+    elif command == "import":
+        if not path:
+            console.print("[red]--path required for import[/red]")
+            raise typer.Exit(1)
+        count = store.import_jsonl(path)
+        console.print(f"Imported {count} records from {path}")
+
+    else:
+        console.print(f"[red]Unknown command: {command}[/red]")
+        console.print("Available: list, stats, export, import")
+
+
+@app.command()
 def version():
     """Show version information."""
     from a1 import __version__

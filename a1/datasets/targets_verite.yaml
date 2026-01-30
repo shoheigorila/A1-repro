@@ -1,0 +1,102 @@
+# VERITE Benchmark Targets
+# Reference: VERITE dataset for smart contract exploit generation
+
+- name: "beanstalk_governance"
+  description: "Beanstalk governance attack via flashloan"
+  chain_id: 1
+  block_number: 14602789
+  addresses:
+    - "0xC1E088fC1323b20BCBee9bd1B9fC9546d5560E6c"  # Beanstalk Diamond
+  tags: ["governance", "flashloan", "proposal"]
+  difficulty: "hard"
+  expected_profit_usd: 182000000
+
+- name: "cream_finance_flashloan"
+  description: "Cream Finance flashloan attack"
+  chain_id: 1
+  block_number: 13499798
+  addresses:
+    - "0x44fbebd2f576670a6c33f6fc0b00aa8c5753b322"  # crETH
+  tags: ["flashloan", "lending", "oracle"]
+  difficulty: "medium"
+  expected_profit_usd: 130000000
+
+- name: "rari_fuse_reentrancy"
+  description: "Rari Fuse pool reentrancy"
+  chain_id: 1
+  block_number: 14684813
+  addresses:
+    - "0xd8553552f8868C1Ef160eEdf031cF0BCf9686945"  # Fuse Pool
+  tags: ["reentrancy", "lending"]
+  difficulty: "medium"
+  expected_profit_usd: 80000000
+
+- name: "ronin_bridge"
+  description: "Ronin bridge validator compromise"
+  chain_id: 1
+  block_number: 14442840
+  addresses:
+    - "0x1a2a1c938ce3ec39b6d47113c7955baa9dd454f2"  # Ronin Bridge
+  tags: ["bridge", "multisig"]
+  difficulty: "hard"
+  expected_profit_usd: 624000000
+
+- name: "nomad_bridge"
+  description: "Nomad bridge replica vulnerability"
+  chain_id: 1
+  block_number: 15259100
+  addresses:
+    - "0x5D94309E5a0090b165FA4181519701637B6DAEBA"  # Nomad Replica
+  tags: ["bridge", "merkle"]
+  difficulty: "medium"
+  expected_profit_usd: 190000000
+
+- name: "wormhole_bridge"
+  description: "Wormhole bridge signature verification bypass"
+  chain_id: 1
+  block_number: 14269474
+  addresses:
+    - "0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B"  # Wormhole
+  tags: ["bridge", "signature"]
+  difficulty: "hard"
+  expected_profit_usd: 320000000
+
+- name: "euler_finance"
+  description: "Euler Finance donation attack"
+  chain_id: 1
+  block_number: 16817995
+  addresses:
+    - "0x27182842E098f60e3D576794A5bFFb0777E025d3"  # Euler
+  tags: ["lending", "donation", "liquidation"]
+  difficulty: "hard"
+  expected_profit_usd: 197000000
+
+- name: "harvest_flashloan"
+  description: "Harvest Finance flashloan arbitrage"
+  chain_id: 1
+  block_number: 11129473
+  addresses:
+    - "0xab7FA2B2985BCcfC13c6D86b1D5A17486ab1e04C"  # fUSDC
+  tags: ["flashloan", "oracle", "arbitrage"]
+  difficulty: "medium"
+  expected_profit_usd: 34000000
+
+- name: "badger_dao"
+  description: "BadgerDAO frontend compromise"
+  chain_id: 1
+  block_number: 13725835
+  addresses:
+    - "0x6354E79F21B56C11f48bcD7c451BE456D7102A36"  # Badger Vault
+  tags: ["approval", "frontend"]
+  difficulty: "easy"
+  expected_profit_usd: 120000000
+
+- name: "indexed_finance"
+  description: "Indexed Finance pool manipulation"
+  chain_id: 1
+  block_number: 13380564
+  addresses:
+    - "0xd4cf33e3843990ef78da3bcdd43cb130b9c40ca4"  # DEFI5
+  tags: ["pool", "manipulation", "rebalance"]
+  difficulty: "hard"
+  expected_profit_usd: 16000000

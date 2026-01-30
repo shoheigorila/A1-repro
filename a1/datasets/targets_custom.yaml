@@ -1,19 +1,62 @@
-# Custom targets for testing
-# Each target defines a contract to analyze
+# Custom Targets for Testing
+# Add your own targets here for experimentation
 
 - name: "dummy_test"
+  description: "Dummy target for testing the framework"
   chain_id: 1
   block_number: 18000000
   addresses:
     - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"  # WETH (for testing)
-  tags: ["test"]
-  description: "Dummy target for testing the framework"
+  tags: ["test", "dummy"]
+  difficulty: "easy"
+  notes: "Use this to verify the framework works correctly"
 
-# Add more targets here following the same format:
-# - name: "target_name"
-#   chain_id: 1  # 1 for Ethereum, 56 for BSC
-#   block_number: 12345678  # Block to fork from
-#   addresses:
-#     - "0x..."  # Target contract addresses
-#   tags: ["tag1", "tag2"]
-#   description: "Description of the target"
+- name: "uniswap_v2_weth_usdc"
+  description: "Uniswap V2 WETH-USDC pair for testing swap operations"
+  chain_id: 1
+  block_number: 18000000
+  addresses:
+    - "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc"  # WETH-USDC pair
+    - "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"  # Uniswap V2 Router
+  tags: ["dex", "swap", "test"]
+  difficulty: "easy"
+
+- name: "aave_v2_lending"
+  description: "Aave V2 lending pool for testing lending operations"
+  chain_id: 1
+  block_number: 18000000
+  addresses:
+    - "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"  # Aave V2 LendingPool
+  tags: ["lending", "aave", "test"]
+  difficulty: "medium"
+
+- name: "compound_v2"
+  description: "Compound V2 for testing lending/borrowing"
+  chain_id: 1
+  block_number: 18000000
+  addresses:
+    - "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"  # Comptroller
+    - "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5"  # cETH
+  tags: ["lending", "compound", "test"]
+  difficulty: "medium"
+
+# BSC Test Targets
+- name: "pancakeswap_wbnb_busd"
+  description: "PancakeSwap WBNB-BUSD pair for testing"
+  chain_id: 56
+  block_number: 30000000
+  addresses:
+    - "0x58F876857a02D6762E0101bb5C46A8c1ED44Dc16"  # WBNB-BUSD pair
+    - "0x10ED43C718714eb63d5aA57B78B54704E256024E"  # PancakeSwap Router
+  tags: ["dex", "swap", "test", "bsc"]
+  difficulty: "easy"
+
+- name: "venus_lending"
+  description: "Venus lending protocol on BSC"
+  chain_id: 56
+  block_number: 30000000
+  addresses:
+    - "0xfD36E2c2a6789Db23113685031d7F16329158384"  # Comptroller
+    - "0xA07c5b74C9B40447a954e1466938b865b6BBea36"  # vBNB
+  tags: ["lending", "venus", "test", "bsc"]
+  difficulty: "medium"

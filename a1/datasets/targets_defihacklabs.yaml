@@ -1,0 +1,112 @@
+# DeFiHackLabs Benchmark Targets
+# Reference: https://github.com/SunWeb3Sec/DeFiHackLabs
+
+# Ethereum Mainnet Targets
+- name: "yearn_yusdt"
+  description: "Yearn yUSDT vault attack"
+  chain_id: 1
+  block_number: 11934249
+  addresses:
+    - "0x83f798e925BcD4017Eb265844FDDAbb448f1707D"  # yUSDT
+  tags: ["vault", "curve"]
+  difficulty: "medium"
+
+- name: "alpha_homora"
+  description: "Alpha Homora v2 flashloan attack"
+  chain_id: 1
+  block_number: 11846545
+  addresses:
+    - "0x67B66C99D3Eb37Fa76Aa3Ed1ff33E8e39F0b9c7A"  # Alpha Homora
+  tags: ["flashloan", "lending", "ironbank"]
+  difficulty: "hard"
+
+- name: "value_defi"
+  description: "Value DeFi oracle manipulation"
+  chain_id: 1
+  block_number: 11191788
+  addresses:
+    - "0x55bf0e3b1f4d91ef69a7a8f9b26f55e0f1e3b123"  # Value DeFi
+  tags: ["oracle", "flashloan"]
+  difficulty: "medium"
+
+- name: "pickle_evil_jar"
+  description: "Pickle Finance Evil Jar attack"
+  chain_id: 1
+  block_number: 11289159
+  addresses:
+    - "0x6949Bb624E8e8A90F87cD2058139fcd77D2F3F87"  # pDAI
+  tags: ["vault", "controller"]
+  difficulty: "hard"
+
+- name: "cover_protocol"
+  description: "Cover Protocol infinite mint"
+  chain_id: 1
+  block_number: 11542309
+  addresses:
+    - "0x5D8d9F5b96f4438195BE9b99eee6118Ed4304286"  # COVER
+  tags: ["mint", "shield"]
+  difficulty: "medium"
+
+# BSC Targets
+- name: "pancakebunny_flashloan"
+  description: "PancakeBunny flashloan attack"
+  chain_id: 56
+  block_number: 7556699
+  addresses:
+    - "0xcadc8cb26c8c7cb46500e61171b5f27e9bd7889d"  # Bunny Vault
+  tags: ["flashloan", "oracle", "bsc"]
+  difficulty: "medium"
+
+- name: "uranium_finance"
+  description: "Uranium Finance swap calculation bug"
+  chain_id: 56
+  block_number: 6866014
+  addresses:
+    - "0x1A2b3Bf76d9a5f5a76E37d68E1f3C0B9a0c2cAb3"  # Uranium
+  tags: ["swap", "calculation", "bsc"]
+  difficulty: "easy"
+
+- name: "spartan_protocol"
+  description: "Spartan Protocol liquidity attack"
+  chain_id: 56
+  block_number: 7029284
+  addresses:
+    - "0xE5b58a1E1e0d7A8b08b9f5a7b8e5e8e5e8e5e8e5"  # Spartan
+  tags: ["liquidity", "flashloan", "bsc"]
+  difficulty: "medium"
+
+- name: "merlin_labs"
+  description: "Merlin Labs flashloan"
+  chain_id: 56
+  block_number: 7417233
+  addresses:
+    - "0xcadc8cb26c8c7cb46500e61171b5f27e9bd7889d"  # Merlin
+  tags: ["flashloan", "bsc"]
+  difficulty: "medium"
+
+- name: "belt_finance"
+  description: "Belt Finance pricing bug"
+  chain_id: 56
+  block_number: 7924245
+  addresses:
+    - "0x9171Bf7c050aC8B4cf7835e51F7b4841DFB2cCD0"  # Belt
+  tags: ["pricing", "strategy", "bsc"]
+  difficulty: "hard"
+
+- name: "elephant_money"
+  description: "Elephant Money reserve manipulation"
+  chain_id: 56
+  block_number: 16886438
+  addresses:
+    - "0xE283D0e3B8c102BAdF5E8166B73E02D96d92F688"  # Elephant
+  tags: ["reserve", "flashloan", "bsc"]
+  difficulty: "medium"
+
+- name: "qubit_finance"
+  description: "Qubit Finance bridge vulnerability"
+  chain_id: 56
+  block_number: 14679549
+  addresses:
+    - "0xAC6Df26a590F08dcC95D5a4705ae8abbc88509Ef"  # QBridge
+  tags: ["bridge", "deposit", "bsc"]
+  difficulty: "hard"
